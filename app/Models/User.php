@@ -12,7 +12,7 @@ class User extends Authenticatable
     use HasFactory, Notifiable;
 
     protected $fillable = [
-        'name', 'email', 'password', 'role', 'phone', 'avatar', 'bio',
+        'name', 'email', 'password', 'role', 'is_active', 'phone', 'avatar', 'bio',
     ];
 
     protected $hidden = [
@@ -24,10 +24,27 @@ class User extends Authenticatable
         return [
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
+            'is_active' => 'boolean',
         ];
     }
 
-    // ─── Role Helpers ────────────────────────────────────────────
+    // ─── Role & Status Helpers ────────────────────────────────────
+
+    public function getAvatarUrlAttribute(): string
+    {
+        if (! empty($this->avatar)) {
+            return str_starts_with($this->avatar, 'http')
+                ? $this->avatar
+                : asset(ltrim($this->avatar, '/'));
+        }
+
+        return 'https://ui-avatars.com/api/?name='.urlencode($this->name).'&background=0ea5e9&color=ffffff&bold=true';
+    }
+
+    public function isActive(): bool
+    {
+        return (bool) ($this->is_active ?? true);
+    }
 
     public function isAdmin(): bool
     {

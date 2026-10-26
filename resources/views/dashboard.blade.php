@@ -35,12 +35,18 @@
                         </span>
                     </div>
 
-                    <h1 class="text-2xl sm:text-3xl font-black text-white tracking-tight">
-                        Selamat Datang Kembali, {{ auth()->user()->name }}! 👋
-                    </h1>
-                    <p class="text-sm text-slate-300 leading-relaxed font-light">
-                        Kelola seluruh reservasi trip, cetak invoice resmi, dan pantau status pemesanan liburan Anda bersama <span class="text-white font-semibold">{{ $company->company_name }}</span>.
-                    </p>
+                    <div class="flex items-center gap-4 pt-1">
+                        <img src="{{ auth()->user()->avatar_url }}" alt="{{ auth()->user()->name }}"
+                             class="w-14 h-14 rounded-2xl object-cover border-2 border-sky-400/80 shadow-lg shadow-sky-500/20 shrink-0">
+                        <div>
+                            <h1 class="text-2xl sm:text-3xl font-black text-white tracking-tight">
+                                Selamat Datang Kembali, {{ auth()->user()->name }}! 👋
+                            </h1>
+                            <p class="text-sm text-slate-300 leading-relaxed font-light mt-0.5">
+                                Kelola seluruh reservasi trip, cetak invoice resmi, dan pantau status pemesanan liburan Anda bersama <span class="text-white font-semibold">{{ $company->company_name }}</span>.
+                            </p>
+                        </div>
+                    </div>
                 </div>
 
                 <!-- Quick Action Buttons -->

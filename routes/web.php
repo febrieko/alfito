@@ -80,10 +80,10 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     Route::resource('destinations', AdminDestinationController::class)->except(['show']);
     Route::patch('destinations/{destination}/toggle-featured', [AdminDestinationController::class, 'toggleFeatured'])->name('destinations.toggle-featured');
 
-    // Users & Roles
-    Route::get('users', [AdminUserController::class, 'index'])->name('users.index');
+    // Users, Roles & Status
+    Route::resource('users', AdminUserController::class)->except(['show']);
+    Route::patch('users/{user}/toggle-active', [AdminUserController::class, 'toggleActive'])->name('users.toggle-active');
     Route::patch('users/{user}/role', [AdminUserController::class, 'updateRole'])->name('users.role');
-    Route::delete('users/{user}', [AdminUserController::class, 'destroy'])->name('users.destroy');
 
     // Review Moderation
     Route::get('reviews', [AdminReviewController::class, 'index'])->name('reviews.index');

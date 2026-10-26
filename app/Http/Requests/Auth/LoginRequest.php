@@ -50,6 +50,16 @@ class LoginRequest extends FormRequest
             ]);
         }
 
+        if (! Auth::user()->isActive()) {
+            Auth::logout();
+
+            RateLimiter::hit($this->throttleKey());
+
+            throw ValidationException::withMessages([
+                'email' => 'Akun Anda telah dinonaktifkan oleh Administrator. Silakan hubungi Customer Service ALFITO.',
+            ]);
+        }
+
         RateLimiter::clear($this->throttleKey());
     }
 

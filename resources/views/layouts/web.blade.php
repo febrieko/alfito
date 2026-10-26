@@ -94,7 +94,7 @@
                     @auth
                         <div class="relative" x-data="{ open: false }">
                             <button @click="open = !open" class="flex items-center gap-2.5 px-3 py-1.5 rounded-full bg-navy-800 border border-slate-700/60 hover:border-sky-500/50 transition">
-                                <img src="{{ auth()->user()->avatar ?? 'https://ui-avatars.com/api/?name='.urlencode(auth()->user()->name).'&background=0ea5e9&color=ffffff' }}" 
+                                <img src="{{ auth()->user()->avatar_url }}" 
                                      alt="{{ auth()->user()->name }}" class="w-7 h-7 rounded-full object-cover">
                                 <span class="text-sm font-medium text-slate-200 max-w-[100px] truncate">{{ auth()->user()->name }}</span>
                                 <svg class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
