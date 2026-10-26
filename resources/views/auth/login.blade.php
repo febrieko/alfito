@@ -4,15 +4,7 @@
 
 @section('content')
 <div class="min-h-[calc(100vh-80px)] bg-navy-950 flex items-center justify-center py-10 px-4 sm:px-6 lg:px-8 relative overflow-hidden"
-     x-data="{
-         showPassword: false,
-         email: '{{ old('email') }}',
-         password: '',
-         fillDemo(demoEmail, demoPass) {
-             this.email = demoEmail;
-             this.password = demoPass;
-         }
-     }">
+     x-data="{ showPassword: false }">
     
     <!-- Decorative Glowing Ambient Lights in Background -->
     <div class="absolute -top-40 -left-40 w-96 h-96 bg-sky-500/10 rounded-full blur-3xl pointer-events-none"></div>
@@ -156,7 +148,7 @@
                             <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-500">
                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 12a4 4 0 10-8 0 4 4 0 008 0zm0 0v1.5a2.5 2.5 0 005 0V12a9 9 0 10-9 9m4.5-1.206a8.959 8.959 0 01-4.5 1.207"/></svg>
                             </div>
-                            <input id="email" type="email" name="email" x-model="email" required autofocus autocomplete="username"
+                            <input id="email" type="email" name="email" value="{{ old('email') }}" required autofocus autocomplete="username"
                                    placeholder="nama@email.com"
                                    class="glass-input w-full pl-10 pr-4 py-3 rounded-xl text-xs border border-slate-700 bg-navy-950 text-white placeholder-slate-500 focus:border-sky-400 focus:ring-2 focus:ring-sky-500/20 transition">
                         </div>
@@ -178,7 +170,7 @@
                             <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-500">
                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
                             </div>
-                            <input id="password" :type="showPassword ? 'text' : 'password'" name="password" x-model="password" required autocomplete="current-password"
+                            <input id="password" :type="showPassword ? 'text' : 'password'" name="password" required autocomplete="current-password"
                                    placeholder="Masukkan kata sandi..."
                                    class="glass-input w-full pl-10 pr-10 py-3 rounded-xl text-xs border border-slate-700 bg-navy-950 text-white placeholder-slate-500 focus:border-sky-400 focus:ring-2 focus:ring-sky-500/20 transition">
                             
@@ -208,34 +200,6 @@
                     </button>
                 </form>
 
-                <!-- Quick Demo Login Helper Box -->
-                <div class="mt-6 p-3.5 rounded-2xl bg-navy-950/70 border border-slate-800 space-y-2">
-                    <div class="text-[11px] font-bold text-slate-300 flex items-center justify-between">
-                        <span class="flex items-center gap-1.5">
-                            <span>⚡</span>
-                            <span>Coba Masuk Cepat (Akun Demo)</span>
-                        </span>
-                        <span class="text-[10px] text-slate-400 font-normal">Klik untuk mengisi otomatis</span>
-                    </div>
-
-                    <div class="grid grid-cols-3 gap-1.5 text-[11px]">
-                        <button type="button" @click="fillDemo('admin@alfito.test', 'password')"
-                                class="px-2 py-1.5 rounded-lg bg-navy-900 hover:bg-sky-500/20 text-sky-300 border border-slate-700/80 hover:border-sky-500/40 transition font-medium flex items-center justify-center gap-1">
-                            <span>👑</span>
-                            <span>Admin</span>
-                        </button>
-                        <button type="button" @click="fillDemo('agen@alfito.test', 'password')"
-                                class="px-2 py-1.5 rounded-lg bg-navy-900 hover:bg-amber-500/20 text-amber-300 border border-slate-700/80 hover:border-amber-500/40 transition font-medium flex items-center justify-center gap-1">
-                            <span>💼</span>
-                            <span>Agen</span>
-                        </button>
-                        <button type="button" @click="fillDemo('traveler@alfito.test', 'password')"
-                                class="px-2 py-1.5 rounded-lg bg-navy-900 hover:bg-emerald-500/20 text-emerald-300 border border-slate-700/80 hover:border-emerald-500/40 transition font-medium flex items-center justify-center gap-1">
-                            <span>🎒</span>
-                            <span>Traveler</span>
-                        </button>
-                    </div>
-                </div>
             </div>
 
             <!-- Bottom Register & Help Links -->
