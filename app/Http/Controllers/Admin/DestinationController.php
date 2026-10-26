@@ -4,14 +4,20 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Destination;
+use App\Services\ImageService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
 use Illuminate\View\View;
 
 class DestinationController extends Controller
 {
+    public function __construct(
+        public ImageService $imageService
+    ) {}
+
     /**
      * Display a listing of destinations.
      */
@@ -49,7 +55,7 @@ class DestinationController extends Controller
             'slug' => ['nullable', 'string', 'max:150', 'unique:destinations,slug'],
             'region' => ['required', 'string', 'max:100'],
             'country' => ['required', 'string', 'max:100'],
-            'thumbnail' => ['required', 'string', 'max:1000'],
+            'thumbnail_file' => ['required', 'image', 'mimes:jpeg,png,jpg,webp,gif', 'max:12288'],
             'description' => ['required', 'string'],
             'is_featured' => ['nullable', 'boolean'],
         ]);
@@ -62,12 +68,20 @@ class DestinationController extends Controller
             $counter++;
         }
 
+        $thumbnail = $this->imageService->resizeAndStore(
+            $request->file('thumbnail_file'),
+            'destinations',
+            1600,
+            1000,
+            85
+        );
+
         Destination::create([
             'name' => $validated['name'],
             'slug' => $slug,
             'region' => $validated['region'],
             'country' => $validated['country'],
-            'thumbnail' => $validated['thumbnail'],
+            'thumbnail' => $thumbnail,
             'description' => $validated['description'],
             'is_featured' => $request->boolean('is_featured'),
         ]);
@@ -93,7 +107,7 @@ class DestinationController extends Controller
             'slug' => ['nullable', 'string', 'max:150', Rule::unique('destinations', 'slug')->ignore($destination->id)],
             'region' => ['required', 'string', 'max:100'],
             'country' => ['required', 'string', 'max:100'],
-            'thumbnail' => ['required', 'string', 'max:1000'],
+            'thumbnail_file' => ['nullable', 'image', 'mimes:jpeg,png,jpg,webp,gif', 'max:12288'],
             'description' => ['required', 'string'],
             'is_featured' => ['nullable', 'boolean'],
         ]);
@@ -106,12 +120,25 @@ class DestinationController extends Controller
             $counter++;
         }
 
+        $thumbnail = $destination->thumbnail;
+
+        if ($request->hasFile('thumbnail_file')) {
+            $this->deleteOldThumbnail($destination->thumbnail);
+            $thumbnail = $this->imageService->resizeAndStore(
+                $request->file('thumbnail_file'),
+                'destinations',
+                1600,
+                1000,
+                85
+            );
+        }
+
         $destination->update([
             'name' => $validated['name'],
             'slug' => $slug,
             'region' => $validated['region'],
             'country' => $validated['country'],
-            'thumbnail' => $validated['thumbnail'],
+            'thumbnail' => $thumbnail,
             'description' => $validated['description'],
             'is_featured' => $request->boolean('is_featured'),
         ]);
@@ -125,6 +152,7 @@ class DestinationController extends Controller
     public function destroy(Destination $destination): RedirectResponse
     {
         $name = $destination->name;
+        $this->deleteOldThumbnail($destination->thumbnail);
         $destination->delete();
 
         return redirect()->route('admin.destinations.index')->with('success', "Destinasi '{$name}' berhasil dihapus.");
@@ -139,5 +167,20 @@ class DestinationController extends Controller
         $status = $destination->is_featured ? 'dijadikan destinasi unggulan' : 'dihapus dari unggulan';
 
         return back()->with('success', "Destinasi '{$destination->name}' berhasil {$status}.");
+    }
+
+    /**
+     * Delete an existing thumbnail file from public storage if it was uploaded locally.
+     */
+    private function deleteOldThumbnail(?string $path): void
+    {
+        if (! $path || str_starts_with($path, 'http')) {
+            return;
+        }
+
+        $relativePath = Str::after($path, '/storage/');
+        if ($relativePath && Storage::disk('public')->exists($relativePath)) {
+            Storage::disk('public')->delete($relativePath);
+        }
     }
 }

@@ -35,7 +35,7 @@
             </div>
         @endif
 
-        <form action="{{ route('admin.destinations.store') }}" method="POST" class="glass-card p-6 rounded-2xl border border-slate-700/60 shadow-xl space-y-5">
+        <form action="{{ route('admin.destinations.store') }}" method="POST" enctype="multipart/form-data" class="glass-card p-6 rounded-2xl border border-slate-700/60 shadow-xl space-y-5">
             @csrf
 
             <div>
@@ -57,10 +57,36 @@
                 </div>
             </div>
 
-            <div>
-                <label for="thumbnail" class="block text-xs font-semibold text-slate-300 mb-1">URL Foto Utama Destinasi <span class="text-rose-400">*</span></label>
-                <input type="url" name="thumbnail" id="thumbnail" required value="{{ old('thumbnail', 'https://images.unsplash.com/photo-1516690561799-46d8f74f9abf?auto=format&fit=crop&w=1200&q=80') }}"
-                       class="glass-input w-full px-4 py-2.5 rounded-xl text-xs border border-slate-700 bg-navy-900 text-white font-mono">
+            <!-- Upload Foto Destinasi dengan Live Preview & Auto-Resize -->
+            <div x-data="{
+                previewUrl: null,
+                handleFileSelect(event) {
+                    const file = event.target.files[0];
+                    if (file) {
+                        this.previewUrl = URL.createObjectURL(file);
+                    }
+                }
+            }" class="space-y-3">
+                <label for="thumbnail_file" class="block text-xs font-semibold text-slate-300 mb-1">
+                    Upload Foto Utama Destinasi <span class="text-rose-400">*</span>
+                </label>
+
+                <!-- Live Preview -->
+                <div x-show="previewUrl" class="relative rounded-2xl overflow-hidden border border-sky-500/30 max-h-64 shadow-xl">
+                    <img :src="previewUrl" alt="Preview Foto Destinasi" class="w-full h-56 object-cover">
+                    <div class="absolute bottom-2 left-2 px-3 py-1 rounded-lg bg-navy-950/80 backdrop-blur-md text-[11px] font-semibold text-sky-300 border border-sky-500/30">
+                        ✓ Foto Terpilih
+                    </div>
+                </div>
+
+                <input type="file" name="thumbnail_file" id="thumbnail_file" required
+                       accept="image/png,image/jpeg,image/jpg,image/webp,image/gif"
+                       @change="handleFileSelect($event)"
+                       class="glass-input w-full px-4 py-2.5 rounded-xl text-xs border border-slate-700 bg-navy-900 text-slate-300 file:mr-4 file:py-1 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-sky-500 file:text-navy-950 hover:file:bg-sky-400 cursor-pointer">
+
+                <p class="text-[11px] text-slate-400">
+                    <span class="text-sky-400 font-semibold">⚡ Auto-Resize:</span> Upload foto langsung dari komputer/HP (maks. 12 MB). Sistem otomatis meresize foto secara proporsional dan mengonversi menjadi WebP beresolusi optimal.
+                </p>
             </div>
 
             <div>
