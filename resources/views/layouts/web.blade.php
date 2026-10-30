@@ -25,6 +25,38 @@
     <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
 
     @stack('styles')
+
+    <!-- Google Translate Custom Styling -->
+    <style>
+        .goog-te-banner-frame,
+        iframe.goog-te-banner-frame {
+            display: none !important;
+            visibility: hidden !important;
+            height: 0 !important;
+        }
+        body {
+            top: 0px !important;
+            position: static !important;
+        }
+        #google_translate_element {
+            display: none !important;
+        }
+        #goog-gt-tt,
+        .goog-te-balloon-frame,
+        .goog-tooltip,
+        .goog-tooltip:hover {
+            display: none !important;
+        }
+        .goog-text-highlight {
+            background-color: transparent !important;
+            box-shadow: none !important;
+            border: none !important;
+        }
+        font[class*="goog-te"] {
+            background-color: transparent !important;
+            box-shadow: none !important;
+        }
+    </style>
 </head>
 <body class="bg-navy-900 text-slate-100 font-sans antialiased min-h-screen flex flex-col" x-data="{ mobileMenuOpen: false }">
 
@@ -60,10 +92,10 @@
                         </div>
                     @endif
                     <div>
-                        <span class="text-xl sm:text-2xl font-black tracking-tight text-white block">
+                        <span class="text-xl sm:text-2xl font-black tracking-tight text-white block notranslate">
                             {{ $company->short_name ?? 'ALFITO' }}
                         </span>
-                        <span class="text-[10px] uppercase tracking-widest text-sky-300 font-semibold block -mt-1">
+                        <span class="text-[10px] uppercase tracking-widest text-sky-300 font-semibold block -mt-1 notranslate">
                             {{ $company->tagline ?? 'Tour & Travel Indonesia' }}
                         </span>
                     </div>
@@ -128,6 +160,9 @@
                         </a>
                     @endauth
 
+                    <!-- Language Switcher (Desktop) -->
+                    <x-language-switcher />
+
                     <!-- WhatsApp CTA Button -->
                     <a href="{{ $company->getWhatsappUrl('Halo ' . ($company->short_name ?? 'ALFITO') . ', saya ingin konsultasi paket wisata') }}" target="_blank"
                        class="flex items-center gap-2 text-xs font-semibold px-3.5 py-2 rounded-xl bg-sky-500/10 border border-sky-500/30 text-sky-400 hover:bg-sky-500 hover:text-navy-950 transition">
@@ -136,8 +171,9 @@
                     </a>
                 </div>
 
-                <!-- Mobile Menu Hamburger -->
+                <!-- Mobile Menu Hamburger & Lang Switcher -->
                 <div class="flex md:hidden items-center gap-2">
+                    <x-language-switcher />
                     <button @click="mobileMenuOpen = !mobileMenuOpen" class="p-2 rounded-lg bg-navy-800 text-slate-200 hover:text-white">
                         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path x-show="!mobileMenuOpen" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
@@ -150,6 +186,7 @@
 
         <!-- Mobile Menu Dropdown -->
         <div x-show="mobileMenuOpen" x-cloak class="md:hidden bg-navy-950/95 border-b border-slate-800 px-4 py-4 space-y-3">
+            <x-language-switcher :mobile="true" />
             <a href="{{ route('home') }}" class="block text-slate-200 hover:text-sky-400 py-1.5 font-medium">Beranda</a>
             <a href="{{ route('tours.index') }}" class="block text-slate-200 hover:text-sky-400 py-1.5 font-medium">Paket Wisata</a>
             <a href="{{ route('tours.index', ['type' => 'open_trip']) }}" class="block text-sky-400 py-1.5 font-medium">Open Trip</a>
@@ -313,7 +350,7 @@
             <!-- Bottom Disclaimer & Payment -->
             <div class="pt-8 flex flex-col md:flex-row items-center justify-between gap-4 text-xs text-slate-500">
                 <p>&copy; {{ date('Y') }} {{ $company->company_name ?? 'ALFITO' }}. {{ $company->footer_text ?? 'All rights reserved. Platform Tour & Travel Terpercaya di Indonesia.' }}</p>
-                <div class="flex items-center gap-4 text-slate-400">
+                <div class="flex items-center gap-4 text-slate-400 notranslate">
                     <span>Metode Pembayaran:</span>
                     @if(!empty($company->bank_accounts) && is_array($company->bank_accounts))
                         @foreach($company->bank_accounts as $bank)
@@ -329,6 +366,50 @@
             </div>
         </div>
     </footer>
+
+    <!-- Hidden Google Translate Element -->
+    <div id="google_translate_element" style="display:none;"></div>
+
+    <script>
+        function googleTranslateElementInit() {
+            new google.translate.TranslateElement({
+                pageLanguage: 'id',
+                includedLanguages: 'id,en',
+                autoDisplay: false
+            }, 'google_translate_element');
+        }
+
+        window.switchSiteLanguage = function(lang) {
+            const currentLang = (localStorage.getItem('site_language') || (document.cookie.includes('googtrans=/id/en') ? 'en' : 'id'));
+            if (currentLang === lang) return;
+
+            const domain = window.location.hostname;
+            if (lang === 'id') {
+                document.cookie = "googtrans=; path=/; expires=Thu, 01 Jan 1970 00:00:00 UTC;";
+                document.cookie = "googtrans=; path=/; domain=" + domain + "; expires=Thu, 01 Jan 1970 00:00:00 UTC;";
+                if (domain.includes('.')) {
+                    const parts = domain.split('.');
+                    const rootDomain = parts.slice(-2).join('.');
+                    document.cookie = "googtrans=; path=/; domain=." + rootDomain + "; expires=Thu, 01 Jan 1970 00:00:00 UTC;";
+                }
+                localStorage.setItem('site_language', 'id');
+                window.location.reload();
+                return;
+            }
+
+            const cookieValue = "/id/" + lang;
+            document.cookie = "googtrans=" + cookieValue + "; path=/;";
+            document.cookie = "googtrans=" + cookieValue + "; path=/; domain=" + domain + ";";
+            if (domain.includes('.')) {
+                const parts = domain.split('.');
+                const rootDomain = parts.slice(-2).join('.');
+                document.cookie = "googtrans=" + cookieValue + "; path=/; domain=." + rootDomain + ";";
+            }
+            localStorage.setItem('site_language', lang);
+            window.location.reload();
+        };
+    </script>
+    <script src="https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
 
     @stack('scripts')
 </body>
